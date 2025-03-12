@@ -1,0 +1,7 @@
+<form action="{% url 'scan_vehicle' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image" required>
+    <button type="submit">Scan</button>
+</form>
+<h2>{{ message }}</h2>
+<p>Detected Plate: {{ plate_number }}</p>

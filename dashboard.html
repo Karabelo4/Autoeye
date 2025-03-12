@@ -1,0 +1,189 @@
+{% extends "car_management/base.html" %}
+
+{% block title %}AUTOEYE - Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+<p class="lead">AUTOEYE – REVOLUTIONIZING VEHICLE SURVEILLANCE</p>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'search' %}" class="text-decoration-none">
+            <div class="card dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h5 class="card-title">SEARCH FOR VEHICLE</h5>
+                    <p class="card-text">Search vehicles by number plate</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'statistics' %}" class="text-decoration-none">
+            <div class="card dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h5 class="card-title">STATISTICS</h5>
+                    <p class="card-text">View statistics of stolen vehicles</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'alerts' %}" class="text-decoration-none">
+            <div class="card dashboard-card">
+                <div class="card-body text-center p-4 position-relative">
+                    {% if unread_alerts_count %}
+                    <span class="alert-badge">{{ unread_alerts_count }}</span>
+                    {% endif %}
+                    <div class="dashboard-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h5 class="card-title">ALERTS</h5>
+                    <p class="card-text">Real-time surveillance alerts</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'reports' %}" class="text-decoration-none">
+            <div class="card dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5 class="card-title">GENERATE REPORT</h5>
+                    <p class="card-text">Reports for crossed vehicles</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Real-Time Surveillance</h5>
+            </div>
+            <div class="card-body real-time-feed">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Location</th>
+                            <th>Number Plate</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sighting in recent_sightings %}
+                        <tr {% if sighting.car.status == 'stolen' %}class="table-danger"{% endif %}>
+                            <td>{{ sighting.timestamp|time:"H:i" }}</td>
+                            <td>{{ sighting.location.name }}</td>
+                            <td>
+                                <a href="{% url 'car_detail' sighting.car.id %}">
+                                    {{ sighting.car.number_plate }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if sighting.car.status == 'stolen' %}
+                                <span class="badge bg-danger">Stolen</span>
+                                {% elif sighting.car.status == 'suspicious' %}
+                                <span class="badge bg-warning">Suspicious</span>
+                                {% else %}
+                                <span class="badge bg-success">Normal</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No recent sightings</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'add_sighting' %}" class="btn btn-primary">Add New Sighting</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{% url 'add_car' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2"></i> Add New Vehicle
+                    </a>
+                    <a href="{% url 'search' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-search me-2"></i> Search Vehicle
+                    </a>
+                    <a href="{% url 'create_report' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-export me-2"></i> Generate New Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Stolen Vehicles:</span>
+                    <span class="badge bg-danger">{{ stolen_cars_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Unread Alerts:</span>
+                    <span class="badge bg-warning">{{ unread_alerts_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>System Status:</span>
+                    <span class="badge bg-success">Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // WebSocket for real-time alerts
+    const alertsSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/alerts/'
+    );
+
+    alertsSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        // Show notification for new alerts
+        if (data.message) {
+            // Create a notification or update the UI
+            const alertCount = document.querySelector('.nav-link .badge');
+            if (alertCount) {
+                alertCount.textContent = parseInt(alertCount.textContent) + 1;
+            } else {
+                const alertLink = document.querySelector('.nav-link i.fa-bell').parentNode;
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-danger';
+                badge.textContent = '1';
+                alertLink.appendChild(badge);
+            }
+        }
+    };
+
+    alertsSocket.onclose = function(e) {
+        console.error('Alert socket closed unexpectedly');
+    };
+</script>
+{% endblock %}
+

@@ -1,0 +1,31 @@
+AUTOEYE/
+├── autoeye/                  # Project directory
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py           # Project settings
+│   ├── urls.py               # Main URL configuration
+│   ├── wsgi.py
+├── car_management/           # Main app
+│   ├── __init__.py
+│   ├── admin.py              # Admin configuration
+│   ├── apps.py
+│   ├── forms.py              # Forms for data input
+│   ├── migrations/           # Database migrations
+│   ├── models.py             # Database models
+│   ├── templates/            # HTML templates
+│   │   ├── base.html         # Base template
+│   │   ├── login.html        # Login page
+│   │   ├── dashboard.html    # Main dashboard
+│   │   ├── search.html       # Search page
+│   │   ├── alerts.html       # Alerts page
+│   │   ├── statistics.html   # Statistics page
+│   │   └── reports.html      # Reports page
+│   ├── static/               # Static files (CSS, JS, images)
+│   ├── tests.py              # Tests
+│   ├── urls.py               # App URL configuration
+│   └── views.py              # View functions
+├── media/                    # User uploaded files
+│   └── driver_images/        # Driver face images
+├── manage.py                 # Django management script
+└── requirements.txt          # Project dependencies
+

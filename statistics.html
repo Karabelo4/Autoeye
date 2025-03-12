@@ -1,0 +1,78 @@
+{% extends "car_management/base.html" %}
+
+{% block title %}AUTOEYE - Statistics{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Statistics of Stolen Vehicles</h1>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Vehicle Status Distribution</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="data:image/png;base64,{{ status_chart_url }}" alt="Vehicle Status Distribution" class="img-fluid">
+                
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in status_stats %}
+                            <tr>
+                                <td>
+                                    {% if stat.status == 'stolen' %}
+                                    <span class="badge bg-danger">Stolen</span>
+                                    {% elif stat.status == 'suspicious' %}
+                                    <span class="badge bg-warning">Suspicious</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ stat.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Monthly Car Sightings</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="data:image/png;base64,{{ sightings_chart_url }}" alt="Monthly Car Sightings" class="img-fluid">
+                
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Number of Sightings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in monthly_sightings %}
+                            <tr>
+                                <td>{{ item.month }}</td>
+                                <td>{{ item.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

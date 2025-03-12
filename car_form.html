@@ -1,0 +1,46 @@
+{% extends "car_management/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}AUTOEYE - {{ title }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{{ title }}</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.number_plate|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.status|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.driver_image|as_crispy_field }}
+                </div>
+            </div>
+            
+            {% if car and car.driver_image %}
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Current Driver Image</label>
+                    <div>
+                        <img src="{{ car.driver_image.url }}" alt="Current Driver Image" class="img-thumbnail" style="max-height: 200px;">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% if car %}{% url 'car_detail' car.id %}{% else %}{% url 'search' %}{% endif %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

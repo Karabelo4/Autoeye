@@ -1,0 +1,100 @@
+{% extends "car_management/base.html" %}
+
+{% block title %}AUTOEYE - Search Vehicles{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Search For Vehicle</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                {{ form.number_plate.label_tag }}
+                {{ form.number_plate }}
+            </div>
+            <div class="col-md-3">
+                {{ form.status.label_tag }}
+                {{ form.status }}
+            </div>
+            <div class="col-md-2">
+                {{ form.date_from.label_tag }}
+                {{ form.date_from }}
+            </div>
+            <div class="col-md-2">
+                {{ form.date_to.label_tag }}
+                {{ form.date_to }}
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Search Results</h5>
+        <a href="{% url 'add_car' %}" class="btn btn-sm btn-primary">Add New Vehicle</a>
+    </div>
+    <div class="col-md-6">
+        <p><strong>Last Seen:</strong> <span id="vehicle-last-seen"></span></p>
+        <p><strong>Location:</strong> <span id="vehicle-last-location"></span></p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Number Plate</th>
+                        <th>Status</th>
+                        <th>Registered On</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in cars %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'car_detail' car.id %}">{{ car.number_plate }}</a>
+                        </td>
+                        <td>
+                            {% if car.status == 'stolen' %}
+                            <span class="badge bg-danger">Stolen</span>
+                            {% elif car.status == 'suspicious' %}
+                            <span class="badge bg-warning">Suspicious</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ car.registered_on|date:"Y-m-d H:i" }}</td>
+                        <td>{{ car.last_updated|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'car_detail' car.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'edit_car' car.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if car.status != 'stolen' %}
+                                <a href="{% url 'mark_as_stolen' car.id %}" class="btn btn-sm btn-danger" 
+                                   onclick="return confirm('Are you sure you want to mark this car as stolen?')">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No vehicles found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends "car_management/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}AUTOEYE - Generate Report{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Generate Report</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.title|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.report_type|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.start_date|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.end_date|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'reports' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_report_type').change(function() {
+            const reportType = $(this).val();
+            const today = new Date();
+            let startDate = new Date();
+            
+            if (reportType === 'daily') {
+                startDate = today;
+            } else if (reportType === 'weekly') {
+                startDate.setDate(today.getDate() - 7);
+            } else if (reportType === 'monthly') {
+                startDate.setMonth(today.getMonth() - 1);
+            }
+            
+            if (reportType !== 'custom') {
+                $('#id_start_date').val(startDate.toISOString().split('T')[0]);
+                $('#id_end_date').val(today.toISOString().split('T')[0]);
+            }
+        });
+    });
+</script>
+{% endblock %}
+

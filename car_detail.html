@@ -1,0 +1,111 @@
+{% extends "car_management/base.html" %}
+
+{% block title %}AUTOEYE - {{ car.number_plate }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Vehicle Details: {{ car.number_plate }}</h1>
+    <div>
+        <a href="{% url 'edit_car' car.id %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        {% if car.status != 'stolen' %}
+        <a href="{% url 'mark_as_stolen' car.id %}" class="btn btn-danger" 
+           onclick="return confirm('Are you sure you want to mark this car as stolen?')">
+            <i class="fas fa-exclamation-triangle"></i> Mark as Stolen
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Vehicle Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Number Plate:</strong>
+                    <p class="mb-0">{{ car.number_plate }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Status:</strong>
+                    <p class="mb-0">
+                        {% if car.status == 'stolen' %}
+                        <span class="badge bg-danger">Stolen</span>
+                        {% elif car.status == 'suspicious' %}
+                        <span class="badge bg-warning">Suspicious</span>
+                        {% else %}
+                        <span class="badge bg-success">Normal</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <strong>Registered On:</strong>
+                    <p class="mb-0">{{ car.registered_on|date:"Y-m-d H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Last Updated:</strong>
+                    <p class="mb-0">{{ car.last_updated|date:"Y-m-d H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        {% if car.driver_image %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Driver Image</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ car.driver_image.url }}" alt="Driver Image" class="img-fluid rounded">
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Sighting History</h5>
+                <a href="{% url 'add_sighting' %}" class="btn btn-sm btn-primary">Add Sighting</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Location</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sighting in sightings %}
+                            <tr>
+                                <td>{{ sighting.timestamp|date:"Y-m-d H:i" }}</td>
+                                <td>{{ sighting.location.name }}</td>
+                                <td>
+                                    {% if sighting.image %}
+                                    <a href="{{ sighting.image.url }}" target="_blank">
+                                        <img src="{{ sighting.image.url }}" alt="Sighting Image" class="img-thumbnail" style="max-height: 50px;">
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">No image</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No sightings recorded</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
